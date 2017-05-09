@@ -16,7 +16,6 @@ namespace EntityFrameworkCore.Repository
     {
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
         int SaveChanges();
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
         void Seed();
         IDataContext CreateInstance();
     }
