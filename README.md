@@ -1,46 +1,68 @@
 # EntityFrameworkCore.Repository
 A generic repository pattern for entity framework core
 
-Entity Type:
-
-    public class Person : Entity<int>
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-    }
 
 Application Database:
 
-    public class ApplicationDataContext : DbContext, IDataContext
+    public class ApplicationDataContext : DbContext
     {
-        public DbSet<Person> People { get; set; }
+        public DbSet<Person> Persons { get; set; }
+    }
+    
+Repository:
 
-        public void Seed()
-        {
-            SeedPeople();
-        }
-
-        public IDataContext CreateInstance()
-        {
-            return new ApplicationDataContext();
-        }
-
-        private void SeedPeople()
-        {
-            People.Add(new Person());
-
-            SaveChanges();
-        }
+    public interface IPersonRepository
+    {
+        IEnumerable<Person> GetPersons(Func<Person, bool> predicate);
+        
+        bool CreatePerson(Person person);
+        
+        bool UpdatePerson(Person person);
+        
+        bool DeletePerson(Person person);
     }
 
+    public class PersonRepository : Repository<ApplicationDataContext>, IPersonRepository
+    {
+        public IEnumerable<Person> GetPersons(Func<Person, bool> predicate)
+        {
+            return All(predicate);
+        }
+
+        public bool CreatePerson(Person person)
+        {
+            return Create(person);
+        }
+
+        public bool UpdatePerson(Person person)
+        {
+            return Update(person);
+        }
+
+        public bool DeletePerson(Person person)
+        {
+            return Delete(person);
+        }
+    }
+    
 Service:
 
-    public class PersonService
+    public interface IPersonService
     {
-        private readonly IRepository<Person, int> _repository;
+        IEnumerable<Person> GetPersonsByLastName(string lastname);
+    }
 
-        public PersonService(IRepository<Person, int> repository)
+    public class PersonService : IPersonService
+    {
+        private readonly IPersonRepository _repository;
+
+        public PersonService(IPersonRepository repository)
         {
             _repository = repository;
+        }
+
+        public IEnumerable<Person> GetPersonsByLastName(string lastname)
+        {
+            return _repository.GetPersons(p => p.LastName.Equals(lastname));
         }
     }
