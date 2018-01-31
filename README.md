@@ -1,15 +1,20 @@
 # EntityFrameworkCore.Repository
 A generic repository pattern for entity framework core
 
+## Installation
 
-Application Database:
+    Install-Package Han.EntityFrameworkCore.Repository
+
+## Usage
+
+### Application Database:
 
     public class ApplicationDataContext : DbContext
     {
         public DbSet<Person> Persons { get; set; }
     }
     
-Repository:
+### Repository:
 
     public interface IPersonRepository
     {
@@ -45,7 +50,7 @@ Repository:
         }
     }
     
-Service:
+### Service:
 
     public interface IPersonService
     {
