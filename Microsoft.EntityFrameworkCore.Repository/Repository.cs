@@ -5,7 +5,7 @@
 //   permission of Adam Hancock
 // -----------------------------------------------------------------------
 
-namespace EntityFrameworkCore.Repository
+namespace Microsoft.EntityFrameworkCore.Repository
 {
 	using System;
 	using System.Collections.Generic;
