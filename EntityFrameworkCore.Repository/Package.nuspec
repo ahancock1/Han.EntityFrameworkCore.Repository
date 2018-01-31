@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>EntityFrameworkCore.Repository</id>
+    <version>1.0.0-beta</version>
+    <authors>Adam Hancock</authors>
+    <owners>Adam Hancock</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Provides a service orientented interface to repositories of a data context in Entity Framework Core</description>
+    <releaseNotes>First release of entity framework repository interface.</releaseNotes>
+    <copyright>Copyright 2018</copyright>
+    <tags>Entity Framework Core Repository</tags>
+    <dependencies>
+      <dependency id="Microsoft.EntityFrameworkCore" version="2.0.1" />
+      <dependency id="Microsoft.EntityFrameworkCore.Design" version="2.0.1" />
+    </dependencies>
+  </metadata>
+</package>

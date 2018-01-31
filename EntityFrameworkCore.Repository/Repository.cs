@@ -12,187 +12,113 @@ namespace EntityFrameworkCore.Repository
 	using System.Linq;
 	using System.Linq.Expressions;
 	using System.Threading.Tasks;
-	using Interfaces;
 	using Microsoft.EntityFrameworkCore;
 
-	public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
-		where TEntity : class, IEntity<TKey>
-		where TKey : IComparable
-	{
-		private readonly IDataContext _context;
+    public class Repository<TContext> : IRepository<TContext>
+        where TContext : DbContext
+    {
+        public IEnumerable<TEntity> All<TEntity>(
+            Func<TEntity, bool> predicate = null,
+            Func<TEntity, object> orderBy = null,
+            int? skip = null,
+            int? take = null,
+            params Expression<Func<TEntity, object>>[] include)
+            where TEntity : class
+        {
+            using (var context = GetDataContext())
+            {
+                return Query<TEntity>(context, predicate, orderBy, skip, take, include).ToList();
+            }
+        }
 
-		public Repository(IDataContext context)
-		{
-			_context = context;
-		}
+        public bool Create<TEntity>(params TEntity[] entities)
+            where TEntity : class
+        {
+            using (var context = GetDataContext())
+            {
+                var set = context.Set<TEntity>();
+                foreach (var entity in entities)
+                {
+                    set.Add(entity);
+                }
 
-		public ICollection<TEntity> All(params Expression<Func<TEntity, object>>[] include)
-		{
-			using (var context = ContextInstance)
-			{
-				return Query(context, include).ToList();
-			}
-		}
+                return context.SaveChanges() >= entities.Length;
+            }
+        }
 
-		public async Task<ICollection<TEntity>> AllAsync(params Expression<Func<TEntity, object>>[] include)
-		{
-			using (var context = ContextInstance)
-			{
-				return await Query(context, include).ToListAsync();
-			}
-		}
+        public bool Delete<TEntity>(params TEntity[] entities)
+            where TEntity : class
+        {
+            using (var context = GetDataContext())
+            {
+                var set = context.Set<TEntity>();
 
-		public bool Delete(params TEntity[] entities)
-		{
-			using (var context = ContextInstance)
-			{
-				var set = Set(context);
-				foreach (var entity in entities)
-				{
-					set.Remove(entity);
-				}
+                foreach (var entity in entities)
+                {
+                    set.Remove(entity);
+                }
 
-				return context.SaveChanges() >= entities.Length;
-			}
-		}
+                return context.SaveChanges() >= entities.Length;
+            }
+        }
 
-		public async Task<bool> DeleteAsync(params TEntity[] entities)
-		{
-			using (var context = ContextInstance)
-			{
-				var set = Set(context);
-				foreach (var entity in entities)
-				{
-					set.Remove(entity);
-				}
+        public bool Update<TEntity>(params TEntity[] entities)
+            where TEntity : class
+        {
+            using (var context = GetDataContext())
+            {
+                var set = context.Set<TEntity>();
+                foreach (var entity in entities)
+                {
+                    set.Update(entity);
+                }
 
-				return await context.SaveChangesAsync() >= entities.Length;
-			}
-		}
+                return context.SaveChanges() >= entities.Length;
+            }
+        }
 
-		public bool Exists(TKey id)
-		{
-			using (var context = ContextInstance)
-			{
-				return Set(context).Any(e => e.Id.Equals(id));
-			}
-		}
+        protected TContext GetDataContext()
+        {
+            var context = Activator.CreateInstance<TContext>();
 
-		public async Task<bool> ExistsAsync(TKey id)
-		{
-			using (var context = ContextInstance)
-			{
-				return await Set(context).AnyAsync(e => e.Id.Equals(id));
-			}
-		}
+            context?.Database.Migrate();
 
-		public ICollection<TEntity> Find(
-			Expression<Func<TEntity, bool>> predicate,
-			params Expression<Func<TEntity, object>>[] include)
-		{
-			using (var context = ContextInstance)
-			{
-				return Query(context, include).Where(predicate).ToList();
-			}
-		}
+            return context;
+        }
 
-		public async Task<ICollection<TEntity>> FindAsync(
-			Expression<Func<TEntity, bool>> predicate,
-			params Expression<Func<TEntity, object>>[] include)
-		{
-			using (var context = ContextInstance)
-			{
-				return await Query(context, include).Where(predicate).ToListAsync();
-			}
-		}
+        protected IEnumerable<TEntity> Query<TEntity>(
+            DbContext context,
+            Func<TEntity, bool> predicate = null,
+            Func<TEntity, object> orderBy = null,
+            int? skip = null,
+            int? take = null,
+            params Expression<Func<TEntity, object>>[] includes)
+            where TEntity : class
+        {
+            var items = includes.Aggregate((IQueryable<TEntity>)context.Set<TEntity>(),
+                (current, item) => current.Include(item)).AsEnumerable();
 
-		public TEntity Get(TKey id, params Expression<Func<TEntity, object>>[] include)
-		{
-			using (var context = ContextInstance)
-			{
-				return Query(context, include).SingleOrDefault(e => e.Id.Equals(id));
-			}
-		}
+            if (predicate != null)
+            {
+                items = items.Where(predicate);
+            }
 
-		public async Task<TEntity> GetAsync(TKey id, params Expression<Func<TEntity, object>>[] include)
-		{
-			using (var context = ContextInstance)
-			{
-				return await Query(context, include).SingleOrDefaultAsync(e => e.Id.Equals(id));
-			}
-		}
+            if (orderBy != null)
+            {
+                items = items.OrderBy(orderBy);
+            }
 
-		public bool Insert(params TEntity[] entities)
-		{
-			using (var context = ContextInstance)
-			{
-				var set = Set(context);
-				foreach (var entity in entities)
-				{
-					set.Add(entity);
-				}
+            if (skip.HasValue)
+            {
+                items = items.Skip(skip.Value);
+            }
 
-				return context.SaveChanges() >= entities.Length;
-			}
-		}
+            if (take.HasValue)
+            {
+                items = items.Take(take.Value);
+            }
 
-		public async Task<bool> InsertAsync(params TEntity[] entities)
-		{
-			using (var context = ContextInstance)
-			{
-				var set = Set(context);
-				foreach (var entity in entities)
-				{
-					set.Add(entity);
-				}
-
-				return await context.SaveChangesAsync() >= entities.Length;
-			}
-		}
-
-		public bool Update(params TEntity[] entities)
-		{
-			using (var context = ContextInstance)
-			{
-				var set = Set(context);
-				foreach (var entity in entities)
-				{
-					set.Update(entity);
-				}
-
-				return context.SaveChanges() >= entities.Length;
-			}
-		}
-
-		public async Task<bool> UpdateAsync(params TEntity[] entities)
-		{
-			using (var context = ContextInstance)
-			{
-				var set = Set(context);
-				foreach (var entity in entities)
-				{
-					set.Update(entity);
-				}
-
-				return await context.SaveChangesAsync() >= entities.Length;
-			}
-		}
-
-		public IQueryable<TEntity> Query(IDataContext context, params Expression<Func<TEntity, object>>[] include)
-		{
-			if (include == null)
-			{
-				return Set(context).AsQueryable();
-			}
-
-			return include.Aggregate((IQueryable<TEntity>)Set(context), (current, item) => current.Include(item));
-		}
-
-		public DbSet<TEntity> Set(IDataContext context)
-		{
-			return context.Set<TEntity>();
-		}
-
-		public IDataContext ContextInstance => _context.CreateInstance();
-	}
+            return items;
+        }
+    }
 }

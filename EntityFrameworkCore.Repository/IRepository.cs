@@ -11,59 +11,26 @@ namespace EntityFrameworkCore.Repository
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
+    using Microsoft.EntityFrameworkCore;
 
-    public interface IRepository<TEntity, in TKey>
-        where TEntity : class, IEntity<TKey>
-        where TKey : IComparable
+    public interface IRepository<out TContext>
+        where TContext : DbContext
     {
-        ICollection<TEntity> All(
-            Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>> orderBy = null,
+        IEnumerable<TEntity> All<TEntity>(
+            Func<TEntity, bool> predicate = null,
+            Func<TEntity, object> orderBy = null,
             int? skip = null,
-            int? take = null);
+            int? take = null,
+            params Expression<Func<TEntity, object>>[] include)
+            where TEntity : class;
 
-        Task<ICollection<TEntity>> AllAsync(
-            Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>> orderBy = null,
-            int? skip = null,
-            int? take = null);
+        bool Create<TEntity>(params TEntity[] entities)
+            where TEntity : class;
 
-        int Count();
+        bool Delete<TEntity>(params TEntity[] entities)
+            where TEntity : class;
 
-        Task<int> CountAsync();
-        
-        bool Create(TEntity entity);
-
-        Task<bool> CreateAsync(TEntity entity);
-
-        bool Delete(TEntity entity);
-
-        Task<bool> DeleteAsync(TEntity entity);
-
-        bool Exists(TEntity entity);
-
-        Task<bool> ExistsAsync(TEntity entity);
-
-        ICollection<TEntity> Find(
-            Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>> orderBy = null,
-            int? skip = null,
-            int? take = null);
-
-        Task<ICollection<TEntity>> FindAsync(
-            Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>> orderBy = null,
-            int? skip = null,
-            int? take = null);
-
-        void Include(params Expression<Func<TEntity, object>>[] includes);
-
-        TEntity Retrieve(TKey id);
-
-        Task<TEntity> RetrieveAsync(TKey id);
-
-        bool Update(TEntity entity);
-
-        Task<bool> UpdateAsync(TEntity entity);
+        bool Update<TEntity>(params TEntity[] entities)
+            where TEntity : class;
     }
 }
