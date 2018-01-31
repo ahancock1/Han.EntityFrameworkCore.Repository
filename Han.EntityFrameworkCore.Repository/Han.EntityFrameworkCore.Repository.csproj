@@ -6,7 +6,7 @@
     <PackageVersion>1.0.0</PackageVersion>
     <Authors>Adam Hancock</Authors>
     <PackageProjectUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository/LICNESE</PackageLicenseUrl>
+    <PackageLicenseUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository/blob/master/LICENSE.txt</PackageLicenseUrl>
     <description>Provides a generic service orientented interface to repositories of a data context in Entity Framework Core</description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <releaseNotes>First release of entity framework repository interface.</releaseNotes>
