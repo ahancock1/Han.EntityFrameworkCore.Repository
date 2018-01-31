@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Han.EntityFrameworkCore.Rep
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4FA1C724-AC3E-4C76-A6F0-C049882999B3}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\Users\adam.hancock.solentim\Desktop\AH.png = ..\..\Users\adam.hancock.solentim\Desktop\AH.png
+		AH.png = AH.png
 	EndProjectSection
 EndProject
 Global
