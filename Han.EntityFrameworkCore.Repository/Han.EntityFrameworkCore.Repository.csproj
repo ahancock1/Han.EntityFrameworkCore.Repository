@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>Microsoft.EntityFrameworkCore.Repository</PackageId>
+    <PackageId>Han.EntityFrameworkCore.Repository</PackageId>
     <Title>Generic EntityFrameworkCore Repository</Title>
     <PackageVersion>1.0.0</PackageVersion>
     <Authors>Adam Hancock</Authors>
-    <PackageProjectUrl>https://github.com/ahancock1/Microsoft.EntityFrameworkCore.Repository</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository/LICNESE</PackageLicenseUrl>
     <description>Provides a generic service orientented interface to repositories of a data context in Entity Framework Core</description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <releaseNotes>First release of entity framework repository interface.</releaseNotes>
@@ -15,12 +16,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6;netstandard2.0;net452;net462</TargetFrameworks>
-    <RootNamespace>Microsoft.EntityFrameworkCore.Repository</RootNamespace>
-    <AssemblyName>Microsoft.EntityFrameworkCore.Repository</AssemblyName>
+    <RootNamespace>Han.EntityFrameworkCore.Repository</RootNamespace>
+    <AssemblyName>Han.EntityFrameworkCore.Repository</AssemblyName>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard2.0\EntityFrameworkCore.Repositories.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netstandard2.0\Han.EntityFrameworkCore.Repository.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net452' OR '$(TargetFramework)'=='netstandard1.6'">

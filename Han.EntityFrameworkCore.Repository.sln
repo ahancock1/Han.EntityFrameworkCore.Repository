@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.EntityFrameworkCore.Repository", "Microsoft.EntityFrameworkCore.Repository\Microsoft.EntityFrameworkCore.Repository.csproj", "{6EB252E3-30F4-4EA3-B05C-6D01B6C1129A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Han.EntityFrameworkCore.Repository", "Han.EntityFrameworkCore.Repository\Han.EntityFrameworkCore.Repository.csproj", "{FBD521B2-B10D-417F-8A33-5DD2BDED3273}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6EB252E3-30F4-4EA3-B05C-6D01B6C1129A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6EB252E3-30F4-4EA3-B05C-6D01B6C1129A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6EB252E3-30F4-4EA3-B05C-6D01B6C1129A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6EB252E3-30F4-4EA3-B05C-6D01B6C1129A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBD521B2-B10D-417F-8A33-5DD2BDED3273}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBD521B2-B10D-417F-8A33-5DD2BDED3273}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBD521B2-B10D-417F-8A33-5DD2BDED3273}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBD521B2-B10D-417F-8A33-5DD2BDED3273}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
