@@ -1,10 +1,30 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>EntityFrameworkCore.Repository</PackageId>
+    <PackageVersion>1.0.0-beta</PackageVersion>
+    <Authors>Adam Hancock</Authors>
+    <description>Provides a service orientented interface to repositories of a data context in Entity Framework Core</description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <releaseNotes>First release of entity framework repository interface.</releaseNotes>
+    <Copyright>Copyright 2018</Copyright>
+    <tags>Entity Framework Core Repository</tags>
   </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.6;netstandard2.0;net452;net462</TargetFrameworks>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard2.0\EntityFrameworkCore.Repository.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net452' OR '$(TargetFramework)'=='netstandard1.6'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="1.1.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="1.1.5" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net462' OR '$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
   </ItemGroup>
