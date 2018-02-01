@@ -1,4 +1,4 @@
-# EntityFrameworkCore.Repository
+# Han.EntityFrameworkCore.Repository
 A generic repository pattern for entity framework core
 
 ## Installation
