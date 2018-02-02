@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <PackageId>Han.EntityFrameworkCore.Repository</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.0.2</PackageVersion>
     <Authors>Adam Hancock</Authors>
     <Title>Generic EntityFrameworkCore Repository</Title>
-    <description>Provides a generic service orientented interface to repositories of a data context in Entity Framework Core</description>
+    <description>Provides a generic service orientented CRUD interface to repositories of a data context in Entity Framework Core with async methods.</description>
     <PackageProjectUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository/blob/master/LICENSE.txt</PackageLicenseUrl>
-    <IconUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository/blob/master/LICENSE.txt</IconUrl>
+    <IconUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository/blob/master/AH.png?raw=true</IconUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <releaseNotes>First release of entity framework repository interface.</releaseNotes>
-    <Copyright>Copyright 2018</Copyright>
+    <releaseNotes>Added documentation and async methods</releaseNotes>
+    <Copyright>Copyright 2018 Adam Hancock</Copyright>
     <tags>Entity Framework Core Repository</tags>
   </PropertyGroup>
 

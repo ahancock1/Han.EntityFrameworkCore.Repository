@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-//   Copyright (C) 2017 Adam Hancock
+//   Copyright (C) 2018 Adam Hancock
 //    
 //   Repository.cs can not be copied and/or distributed without the express
 //   permission of Adam Hancock
@@ -7,30 +7,95 @@
 
 namespace Han.EntityFrameworkCore.Repository
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Linq.Expressions;
-	using System.Threading.Tasks;
-	using Microsoft.EntityFrameworkCore;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Threading.Tasks;
+    using Microsoft.EntityFrameworkCore;
 
-    public class Repository<TContext> : IRepository<TContext>
+    /// <summary>
+    ///     Creates an instance of a generic repository for a <see cref="DbContext" /> and
+    ///     exposes basic CRUD functionality
+    /// </summary>
+    /// <typeparam name="TContext">The data context used for this repository</typeparam>
+    public abstract class Repository<TContext>
         where TContext : DbContext
     {
+        /// <summary>
+        ///     Retrieves entities from the <see cref="DbSet{TEntity}" /> and optionally performs a filter, order by,
+        ///     number of entities to skip and take. Allows include to be performed on the <see cref="DbSet{TEntity}" />
+        /// </summary>
+        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
+        /// <param name="predicate">The filter to apply to the <see cref="DbSet{TEntity}" />. </param>
+        /// <param name="orderby">The ascending order to apply to the <see cref="DbSet{TEntity}" />. </param>
+        /// <param name="skip">The number of entites to skip. </param>
+        /// <param name="take">The number of entities to take. </param>
+        /// <param name="includes">The related entities to include. </param>
+        /// <returns></returns>
         public IEnumerable<TEntity> All<TEntity>(
             Func<TEntity, bool> predicate = null,
-            Func<TEntity, object> orderBy = null,
+            Func<TEntity, object> orderby = null,
+            int? skip = null,
+            int? take = null,
+            params Expression<Func<TEntity, object>>[] includes)
+            where TEntity : class
+        {
+            using (var context = GetDataContext())
+            {
+                var items = includes.Aggregate((IQueryable<TEntity>) context.Set<TEntity>(),
+                    (current, item) => current.Include(item)).AsEnumerable();
+
+                if (predicate != null)
+                {
+                    items = items.Where(predicate);
+                }
+
+                if (orderby != null)
+                {
+                    items = items.OrderBy(orderby);
+                }
+
+                if (skip.HasValue)
+                {
+                    items = items.Skip(skip.Value);
+                }
+
+                if (take.HasValue)
+                {
+                    items = items.Take(take.Value);
+                }
+
+                return items.ToList();
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
+        /// <param name="predicate"></param>
+        /// <param name="orderby"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="include"></param>
+        /// <returns></returns>
+        public Task<IEnumerable<TEntity>> AllAsync<TEntity>(
+            Func<TEntity, bool> predicate = null,
+            Func<TEntity, object> orderby = null,
             int? skip = null,
             int? take = null,
             params Expression<Func<TEntity, object>>[] include)
             where TEntity : class
         {
-            using (var context = GetDataContext())
-            {
-                return Query<TEntity>(context, predicate, orderBy, skip, take, include).ToList();
-            }
+            return Task.Run(() => All(predicate, orderby, skip, take, include));
         }
 
+        /// <summary>
+        ///     Creates the entities in their <see cref="DbSet{TEntity}" />.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
+        /// <param name="entities">The entities to create. </param>
+        /// <returns>True if all entities have been created. </returns>
         public bool Create<TEntity>(params TEntity[] entities)
             where TEntity : class
         {
@@ -46,13 +111,30 @@ namespace Han.EntityFrameworkCore.Repository
             }
         }
 
+        /// <summary>
+        ///     Creates the entities in their <see cref="DbSet{TEntity}" /> async.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
+        /// <param name="entities">The entities to create. </param>
+        /// <returns>True if all entities have been created. </returns>
+        public Task<bool> CreateAsync<TEntity>(params TEntity[] entities)
+            where TEntity : class
+        {
+            return Task.Run(() => Create(entities));
+        }
+
+        /// <summary>
+        ///     Deletes the given entities in their <see cref="DbSet{TEntity}" />.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
+        /// <param name="entities">The entities to delete. </param>
+        /// <returns>True if all the entites have been deleted. </returns>
         public bool Delete<TEntity>(params TEntity[] entities)
             where TEntity : class
         {
             using (var context = GetDataContext())
             {
                 var set = context.Set<TEntity>();
-
                 foreach (var entity in entities)
                 {
                     set.Remove(entity);
@@ -62,6 +144,24 @@ namespace Han.EntityFrameworkCore.Repository
             }
         }
 
+        /// <summary>
+        ///     Deletes the given entities in their <see cref="DbSet{TEntity}" /> async.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
+        /// <param name="entities">The entities to delete. </param>
+        /// <returns>True if all the entites have been deleted. </returns>
+        public Task<bool> DeleteAsync<TEntity>(params TEntity[] entities)
+            where TEntity : class
+        {
+            return Task.Run(() => Delete(entities));
+        }
+
+        /// <summary>
+        ///     Updates the given entities in their <see cref="DbSet{TEntity}" />.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
+        /// <param name="entities">The entities to update. </param>
+        /// <returns>True if all the entites have been updated. </returns>
         public bool Update<TEntity>(params TEntity[] entities)
             where TEntity : class
         {
@@ -77,110 +177,26 @@ namespace Han.EntityFrameworkCore.Repository
             }
         }
 
-        protected TContext GetDataContext()
-        {
-            var context = Activator.CreateInstance<TContext>();
-
-            context?.Database.Migrate();
-
-            return context;
-        }
-
-        protected IEnumerable<TEntity> Query<TEntity>(
-            DbContext context,
-            Func<TEntity, bool> predicate = null,
-            Func<TEntity, object> orderBy = null,
-            int? skip = null,
-            int? take = null,
-            params Expression<Func<TEntity, object>>[] includes)
+        /// <summary>
+        ///     Updates the given entities in their <see cref="DbSet{TEntity}" /> async.
+        /// </summary>
+        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
+        /// <param name="entities">The entities to update. </param>
+        /// <returns>True if all the entites have been updated. </returns>
+        public Task<bool> UpdateAsync<TEntity>(params TEntity[] entities)
             where TEntity : class
         {
-            var items = includes.Aggregate((IQueryable<TEntity>)context.Set<TEntity>(),
-                (current, item) => current.Include(item)).AsEnumerable();
-
-            if (predicate != null)
-            {
-                items = items.Where(predicate);
-            }
-
-            if (orderBy != null)
-            {
-                items = items.OrderBy(orderBy);
-            }
-
-            if (skip.HasValue)
-            {
-                items = items.Skip(skip.Value);
-            }
-
-            if (take.HasValue)
-            {
-                items = items.Take(take.Value);
-            }
-
-            return items;
-        }
-    }
-
-    public class Person
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-    }
-
-    public class ApplicationDataContext : DbContext
-    {
-        public DbSet<Person> Persons { get; set; }
-    }
-
-    public interface IPersonRepository
-    {
-        IEnumerable<Person> GetPersons(Func<Person, bool> predicate);
-        bool CreatePerson(Person person);
-        bool UpdatePerson(Person person);
-        bool DeletePerson(Person person);
-    }
-
-    public class PersonRepository : Repository<ApplicationDataContext>, IPersonRepository
-    {
-        public IEnumerable<Person> GetPersons(Func<Person, bool> predicate)
-        {
-            return All(predicate);
+            return Task.Run(() => Update(entities));
         }
 
-        public bool CreatePerson(Person person)
+        /// <summary>
+        ///     Creates an instance of the <see cref="DbContext" />
+        /// </summary>
+        /// <returns>An instance of the <see cref="DbContext" /></returns>
+        /// <remarks>This should always be disposed of afterwards</remarks>
+        protected virtual TContext GetDataContext()
         {
-            return Create(person);
-        }
-
-        public bool UpdatePerson(Person person)
-        {
-            return Update(person);
-        }
-
-        public bool DeletePerson(Person person)
-        {
-            return Delete(person);
-        }
-    }
-
-    public interface IPersonService
-    {
-        IEnumerable<Person> GetPersonsByLastName(string lastname);
-    }
-
-    public class PersonService : IPersonService
-    {
-        private readonly IPersonRepository _repository;
-
-        public PersonService(IPersonRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public IEnumerable<Person> GetPersonsByLastName(string lastname)
-        {
-            return _repository.GetPersons(p => p.LastName.Equals(lastname));
+            return Activator.CreateInstance<TContext>();
         }
     }
 }
