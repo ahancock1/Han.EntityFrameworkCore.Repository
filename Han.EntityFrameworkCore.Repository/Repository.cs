@@ -32,7 +32,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// <param name="skip">The number of entites to skip. </param>
         /// <param name="take">The number of entities to take. </param>
         /// <param name="includes">The related entities to include. </param>
-        /// <returns></returns>
+        /// <returns>The queried entities</returns>
         protected IEnumerable<TEntity> All<TEntity>(
             Func<TEntity, bool> predicate = null,
             Func<TEntity, object> orderby = null,
@@ -71,14 +71,17 @@ namespace Han.EntityFrameworkCore.Repository
         }
 
         /// <summary>
+        ///     Retrieves entities from the <see cref="DbSet{TEntity}" /> and optionally performs a filter, order by,
+        ///     number of entities to skip and take. Allows include to be performed on the <see cref="DbSet{TEntity}" />
+        ///     async.
         /// </summary>
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
-        /// <param name="predicate"></param>
-        /// <param name="orderby"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="include"></param>
-        /// <returns></returns>
+        /// <param name="predicate">The filter to apply to the <see cref="DbSet{TEntity}" />. </param>
+        /// <param name="orderby">The ascending order to apply to the <see cref="DbSet{TEntity}" />. </param>
+        /// <param name="skip">The number of entites to skip. </param>
+        /// <param name="take">The number of entities to take. </param>
+        /// <param name="includes">The related entities to include. </param>
+        /// <returns>The queried entities</returns>
         protected Task<IEnumerable<TEntity>> AllAsync<TEntity>(
             Func<TEntity, bool> predicate = null,
             Func<TEntity, object> orderby = null,
