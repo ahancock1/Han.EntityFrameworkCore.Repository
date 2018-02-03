@@ -8,14 +8,15 @@ A generic repository pattern for entity framework core
 ## Usage
 
 ### Application Database:
-
+```csharp
     public class ApplicationDataContext : DbContext
     {
         public DbSet<Person> Persons { get; set; }
     }
+```
     
 ### Repository:
-
+```csharp
     public interface IPersonRepository
     {
         IEnumerable<Person> GetPersons(Func<Person, bool> predicate);
@@ -49,9 +50,10 @@ A generic repository pattern for entity framework core
             return Delete(person);
         }
     }
+```
     
 ### Service:
-
+```csharp
     public interface IPersonService
     {
         IEnumerable<Person> GetPersonsByLastName(string lastname);
@@ -71,3 +73,4 @@ A generic repository pattern for entity framework core
             return _repository.GetPersons(p => p.LastName.Equals(lastname));
         }
     }
+```
