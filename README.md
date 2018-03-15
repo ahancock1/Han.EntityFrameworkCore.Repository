@@ -17,37 +17,24 @@ A generic repository pattern for entity framework core
     
 ### Repository:
 ```csharp
-    public interface IPersonRepository
+    public interface IPersonRepository : IRepository<Person>
     {
-        IEnumerable<Person> GetPersons(Func<Person, bool> predicate);
-        
-        bool CreatePerson(Person person);
-        
-        bool UpdatePerson(Person person);
-        
-        bool DeletePerson(Person person);
     }
 
-    public class PersonRepository : Repository<ApplicationDataContext>, IPersonRepository
+    public class PersonRepository 
+        : Repository<ApplicationDataContext, Person>, IPersonRepository
     {
-        public IEnumerable<Person> GetPersons(Func<Person, bool> predicate)
+        public PersonRepository()
         {
-            return All(predicate);
+            Seed();
         }
 
-        public bool CreatePerson(Person person)
+        private void Seed()
         {
-            return Create(person);
-        }
-
-        public bool UpdatePerson(Person person)
-        {
-            return Update(person);
-        }
-
-        public bool DeletePerson(Person person)
-        {
-            return Delete(person);
+            if (!Any())
+            {
+                Create(new Person());
+            }
         }
     }
 ```
@@ -70,7 +57,23 @@ A generic repository pattern for entity framework core
 
         public IEnumerable<Person> GetPersonsByLastName(string lastname)
         {
-            return _repository.GetPersons(p => p.LastName.Equals(lastname));
+            return _repository.All(p => p.LastName.Equals(lastname));
+        }
+    }
+```
+    
+### Dependency Injection - IoC:
+```csharp
+    public class Startup
+    {
+		...
+
+        private void ConfigureRepositories(IServiceCollection services)
+        {
+            // Person
+            services
+                .AddSingleton<IPersonRepository, PersonRepository>()
+                .AddSingleton<IPersonService, PersonService>();
         }
     }
 ```
