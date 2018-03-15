@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-//  <copyright file="Repository.cs" company="Solentim">
+//  <copyright file="IRepository.cs" company="Solentim">
 //      Copyright (c) Solentim 2018. All rights reserved.
 //  </copyright>
 // -----------------------------------------------------------------------
@@ -8,20 +8,11 @@ namespace Han.EntityFrameworkCore.Repository
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
 
-    /// <summary>
-    ///     Creates an instance of a generic repository for a <see cref="DbContext" /> and
-    ///     exposes basic CRUD functionality
-    /// </summary>
-    /// <typeparam name="TContext">The data context used for this repository</typeparam>
-    /// <typeparam name="TEntity">The entity type used for this repository</typeparam>
-    public abstract class Repository<TContext, TEntity>
-        where TContext : DbContext
-        where TEntity : class
+    public interface IRepository<TEntity> where TEntity : class
     {
         /// <summary>
         ///     Retrieves entities from the <see cref="DbSet{TEntity}" /> and optionally performs a filter, order by,
@@ -34,41 +25,12 @@ namespace Han.EntityFrameworkCore.Repository
         /// <param name="take">The number of entities to take. </param>
         /// <param name="includes">The related entities to include. </param>
         /// <returns>The queried entities</returns>
-        public virtual IEnumerable<TEntity> All(
+        IEnumerable<TEntity> All(
             Func<TEntity, bool> predicate = null,
             Func<TEntity, object> orderby = null,
             int? skip = null,
             int? take = null,
-            params Expression<Func<TEntity, object>>[] includes)
-        {
-            using (var context = GetDataContext())
-            {
-                var items = includes.Aggregate((IQueryable<TEntity>)context.Set<TEntity>(),
-                    (current, item) => current.Include(item)).AsEnumerable();
-
-                if (predicate != null)
-                {
-                    items = items.Where(predicate);
-                }
-
-                if (orderby != null)
-                {
-                    items = items.OrderBy(orderby);
-                }
-
-                if (skip.HasValue)
-                {
-                    items = items.Skip(skip.Value);
-                }
-
-                if (take.HasValue)
-                {
-                    items = items.Take(take.Value);
-                }
-
-                return items.ToList();
-            }
-        }
+            params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
         ///     Retrieves entities from the <see cref="DbSet{TEntity}" /> and optionally performs a filter, order by,
@@ -82,15 +44,12 @@ namespace Han.EntityFrameworkCore.Repository
         /// <param name="take">The number of entities to take. </param>
         /// <param name="includes">The related entities to include. </param>
         /// <returns>The queried entities</returns>
-        public Task<IEnumerable<TEntity>> AllAsync(
+        Task<IEnumerable<TEntity>> AllAsync(
             Func<TEntity, bool> predicate = null,
             Func<TEntity, object> orderby = null,
             int? skip = null,
             int? take = null,
-            params Expression<Func<TEntity, object>>[] includes)
-        {
-            return Task.Run(() => All(predicate, orderby, skip, take, includes));
-        }
+            params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
         ///     Determines whether any entities in the <see cref="DbSet{TEntity}"/> satisfies the
@@ -99,18 +58,9 @@ namespace Han.EntityFrameworkCore.Repository
         /// <param name="predicate">The filter to apply to the <see cref="DbSet{TEntity}" />. </param>
         /// <param name="includes">The related entities to include. </param>
         /// <returns>True if any entities satisfy the filter. </returns>
-        public bool Any(
+        bool Any(
             Func<TEntity, bool> predicate = null,
-            params Expression<Func<TEntity, object>>[] includes)
-        {
-            using (var context = GetDataContext())
-            {
-                var entities = includes.Aggregate((IQueryable<TEntity>)context.Set<TEntity>(),
-                    (current, item) => current.Include(item));
-
-                return predicate != null ? entities.Any(predicate) : entities.Any();
-            }
-        }
+            params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
         ///     Determines whether any entities in the <see cref="DbSet{TEntity}"/> satisfies the
@@ -119,12 +69,9 @@ namespace Han.EntityFrameworkCore.Repository
         /// <param name="predicate">The filter to apply to the <see cref="DbSet{TEntity}" />. </param>
         /// <param name="includes">The related entities to include. </param>
         /// <returns>True if any entities satisfy the filter. </returns>
-        public Task<bool> AnyAsync(
+        Task<bool> AnyAsync(
             Func<TEntity, bool> predicate = null,
-            params Expression<Func<TEntity, object>>[] includes)
-        {
-            return Task.Run(() => Any(predicate, includes));
-        }
+            params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
         ///     Creates the entities in their <see cref="DbSet{TEntity}" />.
@@ -132,19 +79,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to create. </param>
         /// <returns>True if all entities have been created. </returns>
-        public virtual bool Create(params TEntity[] entities)
-        {
-            using (var context = GetDataContext())
-            {
-                var set = context.Set<TEntity>();
-                foreach (var entity in entities)
-                {
-                    set.Add(entity);
-                }
-
-                return context.SaveChanges() >= entities.Length;
-            }
-        }
+        bool Create(params TEntity[] entities);
 
         /// <summary>
         ///     Creates the entities in their <see cref="DbSet{TEntity}" /> async.
@@ -152,10 +87,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to create. </param>
         /// <returns>True if all entities have been created. </returns>
-        public Task<bool> CreateAsync(params TEntity[] entities)
-        {
-            return Task.Run(() => Create(entities));
-        }
+        Task<bool> CreateAsync(params TEntity[] entities);
 
         /// <summary>
         ///     Deletes the given entities in their <see cref="DbSet{TEntity}" />.
@@ -163,19 +95,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to delete. </param>
         /// <returns>True if all the entites have been deleted. </returns>
-        public virtual bool Delete(params TEntity[] entities)
-        {
-            using (var context = GetDataContext())
-            {
-                var set = context.Set<TEntity>();
-                foreach (var entity in entities)
-                {
-                    set.Remove(entity);
-                }
-
-                return context.SaveChanges() >= entities.Length;
-            }
-        }
+        bool Delete(params TEntity[] entities);
 
         /// <summary>
         ///     Deletes the given entities in their <see cref="DbSet{TEntity}" /> async.
@@ -183,10 +103,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to delete. </param>
         /// <returns>True if all the entites have been deleted. </returns>
-        public Task<bool> DeleteAsync(params TEntity[] entities)
-        {
-            return Task.Run(() => Delete(entities));
-        }
+        Task<bool> DeleteAsync(params TEntity[] entities);
 
         /// <summary>
         ///     Retrieves the first entity from their <see cref="DbSet{TEntity}"/> otherwise returns
@@ -195,16 +112,9 @@ namespace Han.EntityFrameworkCore.Repository
         /// <param name="predicate">The filter to apply to the <see cref="DbSet{TEntity}" />. </param>
         /// <param name="includes">The related entities to include. </param>
         /// <returns>The first entity matching the filter</returns>
-        public TEntity Get(
+        TEntity Get(
             Func<TEntity, bool> predicate,
-            params Expression<Func<TEntity, object>>[] includes)
-        {
-            using (var context = GetDataContext())
-            {
-                return includes.Aggregate((IQueryable<TEntity>)context.Set<TEntity>(),
-                    (current, item) => current.Include(item)).FirstOrDefault(predicate);
-            }
-        }
+            params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
         ///     Retrieves the first entity from their <see cref="DbSet{TEntity}"/> otherwise returns
@@ -213,12 +123,9 @@ namespace Han.EntityFrameworkCore.Repository
         /// <param name="predicate">The filter to apply to the <see cref="DbSet{TEntity}" />. </param>
         /// <param name="includes">The related entities to include. </param>
         /// <returns>The first entity matching the filter</returns>
-        public Task<TEntity> GetAsync(
+        Task<TEntity> GetAsync(
             Func<TEntity, bool> predicate,
-            params Expression<Func<TEntity, object>>[] includes)
-        {
-            return Task.Run(() => Get(predicate, includes));
-        }
+            params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
         ///     Updates the given entities in their <see cref="DbSet{TEntity}" />.
@@ -226,19 +133,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to update. </param>
         /// <returns>True if all the entites have been updated. </returns>
-        public virtual bool Update(params TEntity[] entities)
-        {
-            using (var context = GetDataContext())
-            {
-                var set = context.Set<TEntity>();
-                foreach (var entity in entities)
-                {
-                    set.Update(entity);
-                }
-
-                return context.SaveChanges() >= entities.Length;
-            }
-        }
+        bool Update(params TEntity[] entities);
 
         /// <summary>
         ///     Updates the given entities in their <see cref="DbSet{TEntity}" /> async.
@@ -246,19 +141,6 @@ namespace Han.EntityFrameworkCore.Repository
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to update. </param>
         /// <returns>True if all the entites have been updated. </returns>
-        public Task<bool> UpdateAsync(params TEntity[] entities)
-        {
-            return Task.Run(() => Update(entities));
-        }
-
-        /// <summary>
-        ///     Creates an instance of the <see cref="DbContext" />
-        /// </summary>
-        /// <returns>An instance of the <see cref="DbContext" /></returns>
-        /// <remarks>This should always be disposed of afterwards</remarks>
-        protected virtual TContext GetDataContext()
-        {
-            return Activator.CreateInstance<TContext>();
-        }
+        Task<bool> UpdateAsync(params TEntity[] entities);
     }
 }
