@@ -76,8 +76,6 @@ A generic repository pattern for entity framework core that exposes CRUD functio
     }
 ```
 
-## Exposes
-
 ### All
 Filters the DbSet based on a predicate, sorts in ascending order, skips a number of entities and returns the specified number of entities. Includes specifies which related entities to include in the query results.
 
@@ -85,23 +83,31 @@ Filters the DbSet based on a predicate, sorts in ascending order, skips a number
 Asynchronously filters the DbSet based on a predicate, sorts in ascending order, skips a number of entities and returns the specified number of entities. Includes specifies which related entities to include in the query results.
 
 ### Any
-Determines whether any entities in the DbSet{TEntity} satisfy a condition.
+Determines whether any entities in the DbSet satisfy a condition.
 
 ### AnyAsync
-Asynchronously determines whether any entities in the DbSet{TEntity} satisfy a condition.
+Asynchronously determines whether any entities in the DbSet satisfy a condition.
 
 ### Create
-
+Inserts the specified entities into the DbSet.
+ 
 ### CreateAsync
-
+ Asynchronously inserts the specified entities into the DbSet.
+ 
 ### Delete 
+Removes the specified entities from the DbSet.
 
 ### DeleteAsync
+Asynchronously removes the specified entities from the DbSet.
 
 ### Get
-
+Retrieves the first entity from the DbSet that satisfies the specified condition otherwise returns default value.
+        
 ### GetAsync
-
+Asynchronously retrieves the first entity from the DbSet that satisfies the specified condition otherwise returns default value
+        
 ### Update
+Updates the specified entities in the DbSet.
 
 ### UpdateAsync
+Asynchronously updates the specified entities in the DbSet.
