@@ -75,6 +75,7 @@ A generic repository pattern for entity framework core that exposes CRUD functio
         }
     }
 ```
+## Documentation
 
 ### All
 Filters the DbSet based on a predicate, sorts in ascending order, skips a number of entities and returns the specified number of entities. Includes specifies which related entities to include in the query results.
