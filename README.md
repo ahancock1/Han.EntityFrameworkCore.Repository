@@ -1,14 +1,14 @@
 # Han.EntityFrameworkCore.Repository
 A generic repository pattern for entity framework core that exposes CRUD functionality and async methods.
 
-Exposes:
+## Exposes
 
-	All + Async
-	Any + Async
-	Create + Async
-	Delete + Async
-	Get + Async
-	Update + Async
+All + AllAsync
+Any + AnyAsync
+Create + CreateAsync
+Delete + DeleteAsync
+Get + GetAsync
+Update + UpdateAsync
 
 ## Installation
 
