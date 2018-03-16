@@ -3,12 +3,18 @@ A generic repository pattern for entity framework core that exposes CRUD functio
 
 ## Exposes
 
-All + AllAsync
-Any + AnyAsync
-Create + CreateAsync
-Delete + DeleteAsync
-Get + GetAsync
-Update + UpdateAsync
+All
+AllAsync
+Any
+AnyAsync
+Create
+CreateAsync
+Delete 
+DeleteAsync
+Get
+GetAsync
+Update
+UpdateAsync
 
 ## Installation
 
