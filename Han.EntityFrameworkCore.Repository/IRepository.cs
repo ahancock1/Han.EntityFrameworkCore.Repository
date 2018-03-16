@@ -1,7 +1,8 @@
 ﻿// -----------------------------------------------------------------------
-//  <copyright file="IRepository.cs" company="Solentim">
-//      Copyright (c) Solentim 2018. All rights reserved.
-//  </copyright>
+//   Copyright (C) 2018 Adam Hancock
+//    
+//   IRepository.cs can not be copied and/or distributed without the express
+//   permission of Adam Hancock
 // -----------------------------------------------------------------------
 
 namespace Han.EntityFrameworkCore.Repository
@@ -12,69 +13,74 @@ namespace Han.EntityFrameworkCore.Repository
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
 
+    /// <summary>
+    ///     Interface that exposes basic CRUD functionality in a generic repository for a <see cref="DbSet{TEntity}" />.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity type used for this repository</typeparam>
     public interface IRepository<TEntity> where TEntity : class
     {
         /// <summary>
-        ///     Retrieves entities from the <see cref="DbSet{TEntity}" /> and optionally performs a filter, order by,
-        ///     number of entities to skip and take. Allows include to be performed on the <see cref="DbSet{TEntity}" />
+        ///     Filters the <see cref="DbSet{TEntity}"/> based on a predicate, sorts in ascending order, skips a number
+        ///     of entities and returns the specified number of entities. Includes specifies which related entities to 
+        ///     include in the query results.
         /// </summary>
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
-        /// <param name="predicate">The filter to apply to the <see cref="DbSet{TEntity}" />. </param>
+        /// <param name="predicate">The condition to apply to the <see cref="DbSet{TEntity}" />. </param>
         /// <param name="orderby">The ascending order to apply to the <see cref="DbSet{TEntity}" />. </param>
         /// <param name="skip">The number of entites to skip. </param>
         /// <param name="take">The number of entities to take. </param>
         /// <param name="includes">The related entities to include. </param>
         /// <returns>The queried entities</returns>
         IEnumerable<TEntity> All(
-            Func<TEntity, bool> predicate = null,
-            Func<TEntity, object> orderby = null,
+            Expression<Func<TEntity, bool>> predicate = null,
+            Expression<Func<TEntity, object>> orderby = null,
             int? skip = null,
             int? take = null,
             params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
-        ///     Retrieves entities from the <see cref="DbSet{TEntity}" /> and optionally performs a filter, order by,
-        ///     number of entities to skip and take. Allows include to be performed on the <see cref="DbSet{TEntity}" />
-        ///     async.
+        ///     Asynchronously filters the <see cref="DbSet{TEntity}"/> based on a predicate, sorts in ascending order, skips a number
+        ///     of entities and returns the specified number of entities. Includes specifies which related entities to 
+        ///     include in the query results.
         /// </summary>
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
-        /// <param name="predicate">The filter to apply to the <see cref="DbSet{TEntity}" />. </param>
+        /// <param name="predicate">The condition to apply to the <see cref="DbSet{TEntity}" />. </param>
         /// <param name="orderby">The ascending order to apply to the <see cref="DbSet{TEntity}" />. </param>
         /// <param name="skip">The number of entites to skip. </param>
         /// <param name="take">The number of entities to take. </param>
         /// <param name="includes">The related entities to include. </param>
         /// <returns>The queried entities</returns>
         Task<IEnumerable<TEntity>> AllAsync(
-            Func<TEntity, bool> predicate = null,
-            Func<TEntity, object> orderby = null,
+            Expression<Func<TEntity, bool>> predicate = null,
+            Expression<Func<TEntity, object>> orderby = null,
             int? skip = null,
             int? take = null,
             params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
-        ///     Determines whether any entities in the <see cref="DbSet{TEntity}"/> satisfies the
-        /// filter.
+        ///     Determines whether any entities in the <see cref="DbSet{TEntity}" /> satisfy
+        ///     a condition.
         /// </summary>
-        /// <param name="predicate">The filter to apply to the <see cref="DbSet{TEntity}" />. </param>
+        /// <param name="predicate">The condition to apply to the <see cref="DbSet{TEntity}" />. </param>
         /// <param name="includes">The related entities to include. </param>
-        /// <returns>True if any entities satisfy the filter. </returns>
+        /// <returns>True if any entities satisfy the condition. </returns>
         bool Any(
-            Func<TEntity, bool> predicate = null,
+            Expression<Func<TEntity, bool>> predicate = null,
             params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
-        ///     Determines whether any entities in the <see cref="DbSet{TEntity}"/> satisfies the
-        /// filter async.
+        ///     Asynchronously determines whether any entities in the <see cref="DbSet{TEntity}" /> satisfy
+        ///     a condition.
         /// </summary>
-        /// <param name="predicate">The filter to apply to the <see cref="DbSet{TEntity}" />. </param>
+        /// <param name="predicate">The condition to apply to the <see cref="DbSet{TEntity}" />. </param>
         /// <param name="includes">The related entities to include. </param>
-        /// <returns>True if any entities satisfy the filter. </returns>
+        /// <returns>True if any entities satisfy the condition. </returns>
         Task<bool> AnyAsync(
-            Func<TEntity, bool> predicate = null,
+            Expression<Func<TEntity, bool>> predicate = null,
             params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
-        ///     Creates the entities in their <see cref="DbSet{TEntity}" />.
+        ///     Inserts the specified entities into the <see cref="DbSet{TEntity}"/>.
         /// </summary>
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to create. </param>
@@ -82,7 +88,7 @@ namespace Han.EntityFrameworkCore.Repository
         bool Create(params TEntity[] entities);
 
         /// <summary>
-        ///     Creates the entities in their <see cref="DbSet{TEntity}" /> async.
+        ///     Asynchronously inserts the specified entities into the <see cref="DbSet{TEntity}"/>.
         /// </summary>
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to create. </param>
@@ -90,45 +96,45 @@ namespace Han.EntityFrameworkCore.Repository
         Task<bool> CreateAsync(params TEntity[] entities);
 
         /// <summary>
-        ///     Deletes the given entities in their <see cref="DbSet{TEntity}" />.
+        ///     Removes the specified entities from the <see cref="DbSet{TEntity}"/>.
         /// </summary>
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
-        /// <param name="entities">The entities to delete. </param>
+        /// <param name="entities">The entities to remove. </param>
         /// <returns>True if all the entites have been deleted. </returns>
         bool Delete(params TEntity[] entities);
 
         /// <summary>
-        ///     Deletes the given entities in their <see cref="DbSet{TEntity}" /> async.
+        ///     Asynchronously removes the specified entities from the <see cref="DbSet{TEntity}"/>.
         /// </summary>
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
-        /// <param name="entities">The entities to delete. </param>
+        /// <param name="entities">The entities to remove. </param>
         /// <returns>True if all the entites have been deleted. </returns>
         Task<bool> DeleteAsync(params TEntity[] entities);
 
         /// <summary>
-        ///     Retrieves the first entity from their <see cref="DbSet{TEntity}"/> otherwise returns
-        /// null.
+        ///     Retrieves the first entity from the <see cref="DbSet{TEntity}" /> that satisfies the specified
+        ///     condition otherwise returns default value.
         /// </summary>
-        /// <param name="predicate">The filter to apply to the <see cref="DbSet{TEntity}" />. </param>
+        /// <param name="predicate">The condition to apply to the <see cref="DbSet{TEntity}" />. </param>
         /// <param name="includes">The related entities to include. </param>
-        /// <returns>The first entity matching the filter</returns>
+        /// <returns>The first entity matching the condition</returns>
         TEntity Get(
-            Func<TEntity, bool> predicate,
+            Expression<Func<TEntity, bool>> predicate,
             params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
-        ///     Retrieves the first entity from their <see cref="DbSet{TEntity}"/> otherwise returns
-        /// null async.
+        ///     Asynchronously retrieves the first entity from the <see cref="DbSet{TEntity}" /> that satisfies the specified
+        ///     condition otherwise returns default value
         /// </summary>
-        /// <param name="predicate">The filter to apply to the <see cref="DbSet{TEntity}" />. </param>
+        /// <param name="predicate">The condition to apply to the <see cref="DbSet{TEntity}" />. </param>
         /// <param name="includes">The related entities to include. </param>
-        /// <returns>The first entity matching the filter</returns>
+        /// <returns>The first entity matching the condition</returns>
         Task<TEntity> GetAsync(
-            Func<TEntity, bool> predicate,
+            Expression<Func<TEntity, bool>> predicate,
             params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
-        ///     Updates the given entities in their <see cref="DbSet{TEntity}" />.
+        ///     Updates the specified entities in the <see cref="DbSet{TEntity}"/>.
         /// </summary>
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to update. </param>
@@ -136,7 +142,7 @@ namespace Han.EntityFrameworkCore.Repository
         bool Update(params TEntity[] entities);
 
         /// <summary>
-        ///     Updates the given entities in their <see cref="DbSet{TEntity}" /> async.
+        ///     Asynchronously updates the specified entities in the <see cref="DbSet{TEntity}"/>.
         /// </summary>
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to update. </param>

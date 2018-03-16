@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Han.EntityFrameworkCore.Repository</PackageId>
-    <PackageVersion>1.0.2</PackageVersion>
+    <PackageVersion>1.1.0</PackageVersion>
     <Authors>Adam Hancock</Authors>
     <Title>Generic EntityFrameworkCore Repository</Title>
     <description>Provides a generic service orientented CRUD interface to repositories of a data context in Entity Framework Core with async methods.</description>
@@ -33,10 +33,6 @@
   <ItemGroup Condition="'$(TargetFramework)'=='net462' OR '$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="TestRepo.cs" />
   </ItemGroup>
 
 </Project>
