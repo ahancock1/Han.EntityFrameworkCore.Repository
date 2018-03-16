@@ -3,12 +3,12 @@ A generic repository pattern for entity framework core that exposes CRUD functio
 
 Exposes:
 
-	All
-	Any
-	Create
-	Delete
-	Get
-	Update
+	All + Async
+	Any + Async
+	Create + Async
+	Delete + Async
+	Get + Async
+	Update + Async
 
 ## Installation
 
@@ -75,8 +75,6 @@ Exposes:
 ```csharp
     public class Startup
     {
-		...
-
         private void ConfigureRepositories(IServiceCollection services)
         {
             // Person
