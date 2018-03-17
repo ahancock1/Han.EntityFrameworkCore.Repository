@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Han.EntityFrameworkCore.Repository</PackageId>
-    <PackageVersion>1.1.0</PackageVersion>
+    <PackageVersion>1.1.1</PackageVersion>
     <Authors>Adam Hancock</Authors>
     <Title>Generic EntityFrameworkCore Repository</Title>
     <description>Provides a generic service orientented CRUD interface to repositories of a data context in Entity Framework Core with async methods.</description>
@@ -10,7 +10,7 @@
     <PackageLicenseUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository/blob/master/LICENSE.txt</PackageLicenseUrl>
     <IconUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository/blob/master/AH.png?raw=true</IconUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <releaseNotes>Added documentation and async methods</releaseNotes>
+    <releaseNotes>Updated EntityFrameworkCore to latest stable version 2.0.2</releaseNotes>
     <Copyright>Copyright 2018 Adam Hancock</Copyright>
     <tags>Entity Framework Core Repository</tags>
   </PropertyGroup>
@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net462' OR '$(TargetFramework)'=='netstandard2.0'">
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.2" />
   </ItemGroup>
 
 </Project>
