@@ -10,6 +10,7 @@ namespace Han.EntityFrameworkCore.Repository
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
 
@@ -18,32 +19,176 @@ namespace Han.EntityFrameworkCore.Repository
     ///     exposes basic CRUD functionality
     /// </summary>
     /// <typeparam name="TContext">The data context used for this repository</typeparam>
-    public abstract class Repository<TContext>
+    /// <typeparam name="TEntity">The entity type used for this repository</typeparam>
+    public abstract class Repository<TContext, TEntity> : IRepository<TEntity>
         where TContext : DbContext
+        where TEntity : class
     {
-        /// <summary>
-        ///     Retrieves entities from the <see cref="DbSet{TEntity}" /> and optionally performs a filter, order by,
-        ///     number of entities to skip and take. Allows include to be performed on the <see cref="DbSet{TEntity}" />
-        /// </summary>
-        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
-        /// <param name="predicate">The filter to apply to the <see cref="DbSet{TEntity}" />. </param>
-        /// <param name="orderby">The ascending order to apply to the <see cref="DbSet{TEntity}" />. </param>
-        /// <param name="skip">The number of entites to skip. </param>
-        /// <param name="take">The number of entities to take. </param>
-        /// <param name="includes">The related entities to include. </param>
-        /// <returns></returns>
-        protected IEnumerable<TEntity> All<TEntity>(
-            Func<TEntity, bool> predicate = null,
-            Func<TEntity, object> orderby = null,
+        /// <inheritdoc cref="IRepository{TEntity}.All"/>
+        public IEnumerable<TEntity> All(
+            Expression<Func<TEntity, bool>> predicate = null,
+            Expression<Func<TEntity, object>> orderby = null,
             int? skip = null,
             int? take = null,
-            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
-            where TEntity : class
+            params Expression<Func<TEntity, object>>[] includes)
+        {
+            return Query(predicate, orderby, skip, take, includes).ToList();
+        }
+
+        /// <inheritdoc cref="IRepository{TEntity}.AllAsync"/>
+        public async Task<IEnumerable<TEntity>> AllAsync(
+            Expression<Func<TEntity, bool>> predicate = null,
+            Expression<Func<TEntity, object>> orderby = null,
+            int? skip = null,
+            int? take = null,
+            params Expression<Func<TEntity, object>>[] includes)
+        {
+            return await Query(predicate, orderby, skip, take, includes).ToListAsync();
+        }
+
+        /// <inheritdoc cref="IRepository{TEntity}.AnyAsync"/>
+        public async Task<bool> AnyAsync(
+            Expression<Func<TEntity, bool>> predicate = null,
+            params Expression<Func<TEntity, object>>[] includes)
         {
             using (var context = GetDataContext())
             {
-                var items = includes.Aggregate((IQueryable<TEntity>)context.Set<TEntity>(),
-                    (current, include) => include(current)).AsEnumerable();
+                var entities = AggregateIncludes(context, includes);
+
+                return await (predicate != null ? entities.AnyAsync(predicate) : entities.AnyAsync());
+            }
+        }
+
+        /// <inheritdoc cref="IRepository{TEntity}.Create"/>
+        public bool Create(params TEntity[] entities)
+        {
+            using (var context = GetDataContext())
+            {
+                var set = context.Set<TEntity>();
+
+                set.AddRange(entities);
+
+                return context.SaveChanges() >= entities.Length;
+            }
+        }
+
+        /// <inheritdoc cref="IRepository{TEntity}.CreateAsync"/>
+        public async Task<bool> CreateAsync(params TEntity[] entities)
+        {
+            using (var context = GetDataContext())
+            {
+                var set = context.Set<TEntity>();
+
+                await set.AddRangeAsync(entities);
+
+                return await context.SaveChangesAsync() >= entities.Length;
+            }
+        }
+
+        /// <inheritdoc cref="IRepository{TEntity}.Delete"/>
+        public bool Delete(params TEntity[] entities)
+        {
+            using (var context = GetDataContext())
+            {
+                var set = context.Set<TEntity>();
+
+                set.RemoveRange(entities);
+
+                return context.SaveChanges() >= entities.Length;
+            }
+        }
+
+        /// <inheritdoc cref="IRepository{TEntity}.DeleteAsync"/>
+        public async Task<bool> DeleteAsync(params TEntity[] entities)
+        {
+            using (var context = GetDataContext())
+            {
+                var set = context.Set<TEntity>();
+
+                set.RemoveRange(entities);
+
+                return await context.SaveChangesAsync() >= entities.Length;
+            }
+        }
+
+        /// <inheritdoc cref="IRepository{TEntity}.Update"/>
+        public bool Update(params TEntity[] entities)
+        {
+            using (var context = GetDataContext())
+            {
+                var set = context.Set<TEntity>();
+
+                set.UpdateRange(entities);
+
+                return context.SaveChanges() >= entities.Length;
+            }
+        }
+
+        /// <inheritdoc cref="IRepository{TEntity}.UpdateAsync"/>
+        public async Task<bool> UpdateAsync(params TEntity[] entities)
+        {
+            using (var context = GetDataContext())
+            {
+                var set = context.Set<TEntity>();
+
+                set.UpdateRange(entities);
+
+                return await context.SaveChangesAsync() >= entities.Length;
+            }
+        }
+
+        /// <inheritdoc cref="IRepository{TEntity}.Any"/>
+        public bool Any(
+            Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, object>>[] includes)
+        {
+            using (var context = GetDataContext())
+            {
+                var entities = AggregateIncludes(context, includes);
+
+                return predicate != null ? entities.Any(predicate) : entities.Any();
+            }
+        }
+
+        /// <inheritdoc cref="IRepository{TEntity}.Get"/>
+        public TEntity Get(
+            Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, object>>[] includes)
+        {
+            using (var context = GetDataContext())
+            {
+                return AggregateIncludes(context, includes).FirstOrDefault(predicate);
+            }
+        }
+
+        /// <inheritdoc cref="IRepository{TEntity}.GetAsync"/>
+        public async Task<TEntity> GetAsync(
+            Expression<Func<TEntity, bool>> predicate,
+            params Expression<Func<TEntity, object>>[] includes)
+        {
+            using (var context = GetDataContext())
+            {
+                return await AggregateIncludes(context, includes).FirstOrDefaultAsync(predicate);
+            }
+        }
+
+        private IQueryable<TEntity> AggregateIncludes(TContext context,
+            params Expression<Func<TEntity, object>>[] includes)
+        {
+            return includes.Aggregate((IQueryable<TEntity>) context.Set<TEntity>(),
+                (current, item) => current.Include(item)).AsQueryable();
+        }
+
+        private IQueryable<TEntity> Query(
+            Expression<Func<TEntity, bool>> predicate = null,
+            Expression<Func<TEntity, object>> orderby = null,
+            int? skip = null,
+            int? take = null,
+            params Expression<Func<TEntity, object>>[] includes)
+        {
+            using (var context = GetDataContext())
+            {
+                var items = AggregateIncludes(context, includes);
 
                 if (predicate != null)
                 {
@@ -65,127 +210,8 @@ namespace Han.EntityFrameworkCore.Repository
                     items = items.Take(take.Value);
                 }
 
-                return items.ToList();
+                return items;
             }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
-        /// <param name="predicate"></param>
-        /// <param name="orderby"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="includes"></param>
-        /// <returns></returns>
-        protected Task<IEnumerable<TEntity>> AllAsync<TEntity>(
-            Func<TEntity, bool> predicate = null,
-            Func<TEntity, object> orderby = null,
-            int? skip = null,
-            int? take = null,
-            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
-            where TEntity : class
-        {
-            return Task.Run(() => All(predicate, orderby, skip, take, includes));
-        }
-
-        /// <summary>
-        ///     Creates the entities in their <see cref="DbSet{TEntity}" />.
-        /// </summary>
-        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
-        /// <param name="entities">The entities to create. </param>
-        /// <returns>True if all entities have been created. </returns>
-        protected bool Create<TEntity>(params TEntity[] entities)
-            where TEntity : class
-        {
-            using (var context = GetDataContext())
-            {
-                var set = context.Set<TEntity>();
-                foreach (var entity in entities)
-                {
-                    set.Add(entity);
-                }
-
-                return context.SaveChanges() >= entities.Length;
-            }
-        }
-
-        /// <summary>
-        ///     Creates the entities in their <see cref="DbSet{TEntity}" /> async.
-        /// </summary>
-        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
-        /// <param name="entities">The entities to create. </param>
-        /// <returns>True if all entities have been created. </returns>
-        protected Task<bool> CreateAsync<TEntity>(params TEntity[] entities)
-            where TEntity : class
-        {
-            return Task.Run(() => Create(entities));
-        }
-
-        /// <summary>
-        ///     Deletes the given entities in their <see cref="DbSet{TEntity}" />.
-        /// </summary>
-        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
-        /// <param name="entities">The entities to delete. </param>
-        /// <returns>True if all the entities have been deleted. </returns>
-        protected bool Delete<TEntity>(params TEntity[] entities)
-            where TEntity : class
-        {
-            using (var context = GetDataContext())
-            {
-                var set = context.Set<TEntity>();
-                foreach (var entity in entities)
-                {
-                    set.Remove(entity);
-                }
-
-                return context.SaveChanges() >= entities.Length;
-            }
-        }
-
-        /// <summary>
-        ///     Deletes the given entities in their <see cref="DbSet{TEntity}" /> async.
-        /// </summary>
-        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
-        /// <param name="entities">The entities to delete. </param>
-        /// <returns>True if all the entities have been deleted. </returns>
-        protected Task<bool> DeleteAsync<TEntity>(params TEntity[] entities)
-            where TEntity : class
-        {
-            return Task.Run(() => Delete(entities));
-        }
-
-        /// <summary>
-        ///     Updates the given entities in their <see cref="DbSet{TEntity}" />.
-        /// </summary>
-        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
-        /// <param name="entities">The entities to update. </param>
-        /// <returns>True if all the entities have been updated. </returns>
-        protected bool Update<TEntity>(params TEntity[] entities)
-            where TEntity : class
-        {
-            using (var context = GetDataContext())
-            {
-                var set = context.Set<TEntity>();
-                foreach (var entity in entities)
-                {
-                    set.Update(entity);
-                }
-
-                return context.SaveChanges() >= entities.Length;
-            }
-        }
-
-        /// <summary>
-        ///     Updates the given entities in their <see cref="DbSet{TEntity}" /> async.
-        /// </summary>
-        /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
-        /// <param name="entities">The entities to update. </param>
-        /// <returns>True if all the entities have been updated. </returns>
-        protected Task<bool> UpdateAsync<TEntity>(params TEntity[] entities)
-            where TEntity : class
-        {
-            return Task.Run(() => Update(entities));
         }
 
         /// <summary>
