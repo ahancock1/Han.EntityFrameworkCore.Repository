@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.6;netstandard2.0;net452;net462;net471;</TargetFrameworks>
+    <TargetFrameworks>netstandard1.6;netstandard2.0;net452;net462;net472;</TargetFrameworks>
     <RootNamespace>Han.EntityFrameworkCore.Repository</RootNamespace>
     <AssemblyName>Han.EntityFrameworkCore.Repository</AssemblyName>
   </PropertyGroup>
@@ -30,7 +30,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="1.1.5" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net462' OR '$(TargetFramework)'=='net471' OR '$(TargetFramework)'=='netstandard2.0'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net462' OR '$(TargetFramework)'=='net472' OR '$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.3" />
   </ItemGroup>
