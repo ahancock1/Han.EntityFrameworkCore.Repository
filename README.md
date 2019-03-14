@@ -10,7 +10,7 @@ A generic repository pattern for entity framework core that exposes CRUD functio
 
 ### Version 1.2
 
-- Changed includes to support EntityFrameworks 'ThenInclude' and 'Include' eager loading. This requires a change to the 'All' for repository.
+- Changed includes to support EntityFrameworks 'ThenInclude' and 'Include' eager loading. This requires a change to the `All` for repository.
 
 	```csharp
            return All(
@@ -76,7 +76,7 @@ Asynchronously updates the specified entities in the DbSet.
 ```csharp
     public class ApplicationDataContext : DbContext
     {
-        public DbSet<School> Students { get; set; }
+		public DbSet<School> Students { get; set; }
 
 		public DbSet<Teacher> Teachers { get; set; }
 
