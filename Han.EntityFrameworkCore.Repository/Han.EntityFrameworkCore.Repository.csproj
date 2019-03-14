@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Han.EntityFrameworkCore.Repository</PackageId>
-    <PackageVersion>1.1.1</PackageVersion>
+    <PackageVersion>1.2</PackageVersion>
     <Authors>Adam Hancock</Authors>
     <Title>Generic EntityFrameworkCore Repository</Title>
     <description>Provides a generic service orientented CRUD interface to repositories of a data context in Entity Framework Core with async methods.</description>
