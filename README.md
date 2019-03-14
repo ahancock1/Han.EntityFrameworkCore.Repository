@@ -1,9 +1,24 @@
 # Han.EntityFrameworkCore.Repository
-A generic repository pattern for entity framework core
+
+	A generic repository pattern for entity framework core
 
 ## Installation
 
     Install-Package Han.EntityFrameworkCore.Repository
+
+## Changes
+
+### Version 1.2
+
+	- Changed includes to support EntityFrameworks 'ThenInclude' and 'Include' eager loading. This requires a change to the 'All' for repository.
+	
+		'
+            return All(
+				predicate: predicate,
+				includes: s => s.Include(i => i.Teachers).ThenInclude(i => i.Qualifications));
+		'
+		
+	- Updated to latest version of EntityFrameworkCore
 
 ## Usage
 
@@ -11,63 +26,94 @@ A generic repository pattern for entity framework core
 
     public class ApplicationDataContext : DbContext
     {
-        public DbSet<Person> Persons { get; set; }
+        public DbSet<School> Students { get; set; }
+
+		public DbSet<Teacher> Teachers { get; set; }
+
+		public DbSet<Qualification> Qualification { get; set; }
     }
+
+	public class ApplicationRepository<T> : Repository<ApplicationDataContext, T>
+		where T : class
+	{
+        private readonly string _connection;
+
+        protected ApplicationRepository(string connection)
+        {
+            _connection = connection;
+        }
+
+        protected override ApplicationDataContext GetDataContext()
+        {
+            var options = new DbContextOptionsBuilder()
+                .UseSqlServer(_connection)
+                .Options;
+
+            return new ApplicationDataContext(options);
+        }
+	}
     
 ### Repository:
 
-    public interface IPersonRepository
+    public interface ISchoolRepository
     {
-        IEnumerable<Person> GetPersons(Func<Person, bool> predicate);
+        IEnumerable<School> GetSchools(Func<School, bool> predicate);
         
-        bool CreatePerson(Person person);
+        bool CreateSchool(School School);
         
-        bool UpdatePerson(Person person);
+        bool UpdateSchool(School School);
         
-        bool DeletePerson(Person person);
+        bool DeleteSchool(School School);
     }
 
-    public class PersonRepository : Repository<ApplicationDataContext>, IPersonRepository
+    public class SchoolRepository : ApplicationRepository<ApplicationDataContext>, ISchoolRepository
     {
-        public IEnumerable<Person> GetPersons(Func<Person, bool> predicate)
+        public ProductsRepository(string connection) 
+            : base(connection)
+        { }
+
+        public IEnumerable<School> GetSchools(Func<School, bool> predicate)
         {
-            return All(predicate);
+            return All(
+				predicate: predicate,
+				includes: s => s.Include(i => i.Teachers).ThenInclude(i => i.Qualifications));
         }
 
-        public bool CreatePerson(Person person)
+        public bool CreateSchool(School School)
         {
-            return Create(person);
+            return Create(School);
         }
 
-        public bool UpdatePerson(Person person)
+        public bool UpdateSchool(School School)
         {
-            return Update(person);
+            return Update(School);
         }
 
-        public bool DeletePerson(Person person)
+        public bool DeleteSchool(School School)
         {
-            return Delete(person);
+            return Delete(School);
         }
     }
     
 ### Service:
 
-    public interface IPersonService
+    public interface ISchoolService
     {
-        IEnumerable<Person> GetPersonsByLastName(string lastname);
+        IEnumerable<School> GetSchoolByPostcode(string postcode);
     }
 
-    public class PersonService : IPersonService
+    public class SchoolService : ISchoolService
     {
-        private readonly IPersonRepository _repository;
+        private readonly ISchoolRepository _repository;
 
-        public PersonService(IPersonRepository repository)
+        public SchoolService(ISchoolRepository repository)
         {
             _repository = repository;
         }
 
-        public IEnumerable<Person> GetPersonsByLastName(string lastname)
+        public IEnumerable<School> GetSchoolByPostcode(string lastname)
         {
-            return _repository.GetPersons(p => p.LastName.Equals(lastname));
+            return _repository.GetSchools(p => 
+				p.Postcode.Equals(lastname, StringComparison.OrdinalIgnoreCase));
         }
     }
