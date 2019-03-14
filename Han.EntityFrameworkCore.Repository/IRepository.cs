@@ -26,14 +26,14 @@ namespace Han.EntityFrameworkCore.Repository
         ///     include in the query results.
         /// </summary>
         /// <param name="predicate">The condition to apply to the <see cref="DbSet{TEntity}" />. </param>
-        /// <param name="orderby">The ascending order to apply to the <see cref="DbSet{TEntity}" />. </param>
+        /// <param name="sort">The ascending order to apply to the <see cref="DbSet{TEntity}" />. </param>
         /// <param name="skip">The number of entities to skip. </param>
         /// <param name="take">The number of entities to take. </param>
         /// <param name="includes">The related entities to include. </param>
         /// <returns>The queried entities</returns>
         IEnumerable<TEntity> All(
             Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>> orderby = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> sort = null,
             int? skip = null,
             int? take = null,
             params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes);
@@ -44,14 +44,14 @@ namespace Han.EntityFrameworkCore.Repository
         ///     include in the query results.
         /// </summary>
         /// <param name="predicate">The condition to apply to the <see cref="DbSet{TEntity}" />. </param>
-        /// <param name="orderby">The ascending order to apply to the <see cref="DbSet{TEntity}" />. </param>
-        /// <param name="skip">The number of entites to skip. </param>
+        /// <param name="sort">The ascending order to apply to the <see cref="DbSet{TEntity}" />. </param>
+        /// <param name="skip">The number of entities to skip. </param>
         /// <param name="take">The number of entities to take. </param>
         /// <param name="includes">The related entities to include. </param>
         /// <returns>The queried entities</returns>
         Task<IEnumerable<TEntity>> AllAsync(
             Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>> orderby = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> sort = null,
             int? skip = null,
             int? take = null,
             params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes);

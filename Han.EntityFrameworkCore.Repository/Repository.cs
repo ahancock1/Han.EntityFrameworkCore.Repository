@@ -27,23 +27,23 @@ namespace Han.EntityFrameworkCore.Repository
         /// <inheritdoc cref="IRepository{TEntity}.All"/>
         public IEnumerable<TEntity> All(
             Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>> orderby = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> sort = null,
             int? skip = null,
             int? take = null,
             params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
         {
-            return Query(predicate, orderby, skip, take, includes).ToList();
+            return Query(predicate, sort, skip, take, includes);
         }
 
         /// <inheritdoc cref="IRepository{TEntity}.AllAsync"/>
         public async Task<IEnumerable<TEntity>> AllAsync(
             Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>> orderby = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> sort = null,
             int? skip = null,
             int? take = null,
             params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
         {
-            return await Query(predicate, orderby, skip, take, includes).ToListAsync();
+            return await QueryAsync(predicate, sort, skip, take, includes);
         }
 
         /// <inheritdoc cref="IRepository{TEntity}.AnyAsync"/>
@@ -179,38 +179,62 @@ namespace Han.EntityFrameworkCore.Repository
                 (current, include) => include(current)).AsQueryable();
         }
 
-        private IQueryable<TEntity> Query(
+        private IQueryable<TEntity> AggregateQuery(
+            TContext context,
             Expression<Func<TEntity, bool>> predicate = null,
-            Expression<Func<TEntity, object>> orderby = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> sort = null,
+            int? skip = null,
+            int? take = null,
+            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
+        {
+            var items = AggregateIncludes(context, includes);
+
+            if (predicate != null)
+            {
+                items = items.Where(predicate);
+            }
+
+            if (sort != null)
+            {
+                items = sort(items);
+            }
+
+            if (skip.HasValue)
+            {
+                items = items.Skip(skip.Value);
+            }
+
+            if (take.HasValue)
+            {
+                items = items.Take(take.Value);
+            }
+
+            return items;
+        }
+
+        private Task<List<TEntity>> QueryAsync(
+            Expression<Func<TEntity, bool>> predicate = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> sort = null,
             int? skip = null,
             int? take = null,
             params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
         {
             using (var context = GetDataContext())
             {
-                var items = AggregateIncludes(context, includes);
+                return AggregateQuery(context, predicate, sort, skip, take, includes).ToListAsync();
+            }
+        }
 
-                if (predicate != null)
-                {
-                    items = items.Where(predicate);
-                }
-
-                if (orderby != null)
-                {
-                    items = items.OrderBy(orderby);
-                }
-
-                if (skip.HasValue)
-                {
-                    items = items.Skip(skip.Value);
-                }
-
-                if (take.HasValue)
-                {
-                    items = items.Take(take.Value);
-                }
-
-                return items;
+        private IEnumerable<TEntity> Query(
+            Expression<Func<TEntity, bool>> predicate = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> sort = null,
+            int? skip = null,
+            int? take = null,
+            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
+        {
+            using (var context = GetDataContext())
+            {
+                return AggregateQuery(context, predicate, sort, skip, take, includes).ToList();
             }
         }
 

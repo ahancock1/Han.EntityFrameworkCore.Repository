@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Han.EntityFrameworkCore.Repository</PackageId>
-    <PackageVersion>1.2</PackageVersion>
+    <PackageVersion>1.3</PackageVersion>
     <Authors>Adam Hancock</Authors>
     <Title>Generic EntityFrameworkCore Repository</Title>
     <description>Provides a generic service orientented CRUD interface to repositories of a data context in Entity Framework Core with async methods.</description>
@@ -10,13 +10,13 @@
     <PackageLicenseUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository/blob/master/LICENSE.txt</PackageLicenseUrl>
     <IconUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository/blob/master/AH.png?raw=true</IconUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <releaseNotes>Updated EntityFrameworkCore to latest stable version 2.0.2</releaseNotes>
+    <releaseNotes>Updated EntityFrameworkCore to latest stable version 2.2.3</releaseNotes>
     <Copyright>Copyright 2018 Adam Hancock</Copyright>
     <tags>Entity Framework Core Repository</tags>
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.6;netstandard2.0;net452;net462;net472;</TargetFrameworks>
+    <TargetFrameworks>netstandard1.6;netstandard2.0;net452;net462;net471;</TargetFrameworks>
     <RootNamespace>Han.EntityFrameworkCore.Repository</RootNamespace>
     <AssemblyName>Han.EntityFrameworkCore.Repository</AssemblyName>
   </PropertyGroup>
@@ -30,7 +30,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="1.1.5" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net462' OR '$(TargetFramework)'=='net472' OR '$(TargetFramework)'=='netstandard2.0'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net462' OR '$(TargetFramework)'=='net471' OR '$(TargetFramework)'=='netstandard2.0'">
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.3" />
   </ItemGroup>

@@ -8,6 +8,12 @@ A generic repository pattern for entity framework core that exposes CRUD functio
     
 ## Changes
 
+### Version 1.3
+
+- Fixed DataContext disposed exception
+- Changed sort or queries to allow sorting in ascending and descending order
+- Targeting latest net471 framework
+
 ### Version 1.2
 
 - Changed includes to support EntityFrameworks 'ThenInclude' and 'Include' eager loading. This requires a change to the `All` for repository.
