@@ -10,9 +10,8 @@
     <PackageLicenseUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository/blob/master/LICENSE.txt</PackageLicenseUrl>
     <IconUrl>https://github.com/ahancock1/Han.EntityFrameworkCore.Repository/blob/master/AH.png?raw=true</IconUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <releaseNotes>Updated EntityFrameworkCore to latest stable version 2.2.3</releaseNotes>
-    <Copyright>Copyright 2018 Adam Hancock</Copyright>
-    <tags>Entity Framework Core Repository</tags>
+    <Copyright>Copyright 2019 Adam Hancock</Copyright>
+    <PackageTags>Repository, Entity Framework Core, Generic</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup>
