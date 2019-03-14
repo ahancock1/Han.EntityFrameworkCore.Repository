@@ -1,47 +1,74 @@
 # Han.EntityFrameworkCore.Repository
-A generic repository pattern for entity framework core that exposes CRUD functionality and async methods.
+
+	A generic repository pattern for entity framework core that exposes CRUD functionality and async methods.
 
 ## Installation
 
     Install-Package Han.EntityFrameworkCore.Repository
     
+## Changes
+
+### Version 1.2
+
+	- Changed includes to support EntityFrameworks 'ThenInclude' and 'Include' eager loading. This requires a change to the 'All' for repository.
+	
+		'
+            return All(
+				predicate: predicate,
+				includes: s => s.Include(i => i.Teachers).ThenInclude(i => i.Qualifications));
+		'
+		
+	- Updated to latest version of EntityFrameworkCore
+
 ## Documentation
 
 ### All
-Filters the DbSet based on a predicate, sorts in ascending order, skips a number of entities and returns the specified number of entities. Includes specifies which related entities to include in the query results.
+
+	Filters the DbSet based on a predicate, sorts in ascending order, skips a number of entities and returns the specified number of entities. Includes specifies which related entities to include in the query results.
 
 ### AllAsync
-Asynchronously filters the DbSet based on a predicate, sorts in ascending order, skips a number of entities and returns the specified number of entities. Includes specifies which related entities to include in the query results.
+	
+	Asynchronously filters the DbSet based on a predicate, sorts in ascending order, skips a number of entities and returns the specified number of entities. Includes specifies which related entities to include in the query results.
 
 ### Any
-Determines whether any entities in the DbSet satisfy a condition.
+	
+	Determines whether any entities in the DbSet satisfy a condition.
 
 ### AnyAsync
-Asynchronously determines whether any entities in the DbSet satisfy a condition.
+
+	Asynchronously determines whether any entities in the DbSet satisfy a condition.
 
 ### Create
-Inserts the specified entities into the DbSet.
+
+	Inserts the specified entities into the DbSet.
  
 ### CreateAsync
- Asynchronously inserts the specified entities into the DbSet.
+ 
+	Asynchronously inserts the specified entities into the DbSet.
  
 ### Delete 
-Removes the specified entities from the DbSet.
+
+	Removes the specified entities from the DbSet.
 
 ### DeleteAsync
-Asynchronously removes the specified entities from the DbSet.
+
+	Asynchronously removes the specified entities from the DbSet.
 
 ### Get
-Retrieves the first entity from the DbSet that satisfies the specified condition otherwise returns default value.
+
+	Retrieves the first entity from the DbSet that satisfies the specified condition otherwise returns default value.
         
 ### GetAsync
-Asynchronously retrieves the first entity from the DbSet that satisfies the specified condition otherwise returns default value
+
+	Asynchronously retrieves the first entity from the DbSet that satisfies the specified condition otherwise returns default value
         
 ### Update
-Updates the specified entities in the DbSet.
+
+	Updates the specified entities in the DbSet.
 
 ### UpdateAsync
-Asynchronously updates the specified entities in the DbSet.
+
+	Asynchronously updates the specified entities in the DbSet.
 
 ## Usage
 
@@ -49,58 +76,98 @@ Asynchronously updates the specified entities in the DbSet.
 ```csharp
     public class ApplicationDataContext : DbContext
     {
-        public DbSet<Person> Persons { get; set; }
+        public DbSet<School> Students { get; set; }
+
+		public DbSet<Teacher> Teachers { get; set; }
+
+		public DbSet<Qualification> Qualification { get; set; }
     }
+
+	public class ApplicationRepository<T> : Repository<ApplicationDataContext, T>
+		where T : class
+	{
+        private readonly string _connection;
+
+        protected ApplicationRepository(string connection)
+        {
+            _connection = connection;
+        }
+
+        protected override ApplicationDataContext GetDataContext()
+        {
+            var options = new DbContextOptionsBuilder()
+                .UseSqlServer(_connection)
+                .Options;
+
+            return new ApplicationDataContext(options);
+        }
+	}
 ```
     
 ### Repository:
 ```csharp
-    public interface IPersonRepository : IRepository<Person>
+    public interface ISchoolRepository
     {
+        IEnumerable<School> GetSchools(Func<School, bool> predicate);
+        
+        bool CreateSchool(School School);
+        
+        bool UpdateSchool(School School);
+        
+        bool DeleteSchool(School School);
     }
 
-    public class PersonRepository 
-        : Repository<ApplicationDataContext, Person>, IPersonRepository
+    public class SchoolRepository : ApplicationRepository<ApplicationDataContext>, ISchoolRepository
     {
-        public PersonRepository()
+        public ProductsRepository(string connection) 
+            : base(connection)
+        { }
+
+        public IEnumerable<School> GetSchools(Func<School, bool> predicate)
         {
-            Seed();
+            return All(
+				predicate: predicate,
+				includes: s => s.Include(i => i.Teachers).ThenInclude(i => i.Qualifications));
         }
 
-        private void Seed()
+        public bool CreateSchool(School School)
         {
-            if (!Any())
-            {
-                Create(new Person());
-            }
+            return Create(School);
+        }
+
+        public bool UpdateSchool(School School)
+        {
+            return Update(School);
+        }
+
+        public bool DeleteSchool(School School)
+        {
+            return Delete(School);
         }
     }
 ```
     
 ### Service:
 ```csharp
-    public interface IPersonService
+    public interface ISchoolService
     {
-        IEnumerable<Person> GetPersonsByLastName(string lastname);
-        
-        ...
+        IEnumerable<School> GetSchoolByPostcode(string postcode);
     }
 
-    public class PersonService : IPersonService
+    public class SchoolService : ISchoolService
     {
-        private readonly IPersonRepository _repository;
+        private readonly ISchoolRepository _repository;
 
-        public PersonService(IPersonRepository repository)
+        public SchoolService(ISchoolRepository repository)
         {
             _repository = repository;
         }
 
-        public IEnumerable<Person> GetPersonsByLastName(string lastname)
+        public IEnumerable<School> GetSchoolByPostcode(string lastname)
         {
-            return _repository.All(p => p.LastName.Equals(lastname));
+            return _repository.GetSchools(p => 
+				p.Postcode.Equals(lastname, StringComparison.OrdinalIgnoreCase));
         }
-        
-        ...
     }
 ```
     
@@ -112,8 +179,8 @@ Asynchronously updates the specified entities in the DbSet.
         {
             // Person
             services
-                .AddSingleton<IPersonRepository, PersonRepository>()
-                .AddSingleton<IPersonService, PersonService>();
+                .AddSingleton<ISchoolRepository, SchoolRepository>()
+                .AddSingleton<ISchoolService, SchoolService>();
         }
     }
 ```
