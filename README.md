@@ -12,7 +12,7 @@ A generic repository pattern for entity framework core that exposes CRUD functio
 
 - Fixed DataContext disposed exception
 - Changed sort or queries to allow sorting in ascending and descending order
-- Targeting latest net471 framework
+- Targeting latest net472 framework
 
 ### Version 1.2
 
@@ -88,7 +88,8 @@ Asynchronously updates the specified entities in the DbSet.
 
 		public DbSet<Qualification> Qualification { get; set; }
     }
-
+```
+```csharp
 	public class ApplicationRepository<T> : Repository<ApplicationDataContext, T>
 		where T : class
 	{
@@ -122,7 +123,8 @@ Asynchronously updates the specified entities in the DbSet.
         
         bool DeleteSchool(School School);
     }
-
+```
+```csharp
     public class SchoolRepository : ApplicationRepository<ApplicationDataContext>, ISchoolRepository
     {
         public ProductsRepository(string connection) 
@@ -159,7 +161,8 @@ Asynchronously updates the specified entities in the DbSet.
     {
         IEnumerable<School> GetSchoolByPostcode(string postcode);
     }
-
+```
+```csharp
     public class SchoolService : ISchoolService
     {
         private readonly ISchoolRepository _repository;
