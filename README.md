@@ -1,74 +1,74 @@
 # Han.EntityFrameworkCore.Repository
 
-	A generic repository pattern for entity framework core that exposes CRUD functionality and async methods.
+A generic repository pattern for entity framework core that exposes CRUD functionality and async methods.
 
 ## Installation
 
-    Install-Package Han.EntityFrameworkCore.Repository
+	Install-Package Han.EntityFrameworkCore.Repository
     
 ## Changes
 
 ### Version 1.2
 
-	- Changed includes to support EntityFrameworks 'ThenInclude' and 'Include' eager loading. This requires a change to the 'All' for repository.
+- Changed includes to support EntityFrameworks 'ThenInclude' and 'Include' eager loading. This requires a change to the 'All' for repository.
+
+	```csharp
+           return All(
+			predicate: predicate,
+			includes: s => s.Include(i => i.Teachers).ThenInclude(i => i.Qualifications));
+	```
 	
-		'
-            return All(
-				predicate: predicate,
-				includes: s => s.Include(i => i.Teachers).ThenInclude(i => i.Qualifications));
-		'
-		
-	- Updated to latest version of EntityFrameworkCore
+- Updated to latest version of EntityFrameworkCore
 
 ## Documentation
 
 ### All
 
-	Filters the DbSet based on a predicate, sorts in ascending order, skips a number of entities and returns the specified number of entities. Includes specifies which related entities to include in the query results.
+Filters the DbSet based on a predicate, sorts in ascending order, skips a number of entities and returns the specified number of entities. Includes specifies which related entities to include in the query results.
 
 ### AllAsync
 	
-	Asynchronously filters the DbSet based on a predicate, sorts in ascending order, skips a number of entities and returns the specified number of entities. Includes specifies which related entities to include in the query results.
+Asynchronously filters the DbSet based on a predicate, sorts in ascending order, skips a number of entities and returns the specified number of entities. Includes specifies which related entities to include in the query results.
 
 ### Any
 	
-	Determines whether any entities in the DbSet satisfy a condition.
+Determines whether any entities in the DbSet satisfy a condition.
 
 ### AnyAsync
 
-	Asynchronously determines whether any entities in the DbSet satisfy a condition.
+Asynchronously determines whether any entities in the DbSet satisfy a condition.
 
 ### Create
 
-	Inserts the specified entities into the DbSet.
+Inserts the specified entities into the DbSet.
  
 ### CreateAsync
  
-	Asynchronously inserts the specified entities into the DbSet.
+Asynchronously inserts the specified entities into the DbSet.
  
 ### Delete 
 
-	Removes the specified entities from the DbSet.
+Removes the specified entities from the DbSet.
 
 ### DeleteAsync
 
-	Asynchronously removes the specified entities from the DbSet.
+Asynchronously removes the specified entities from the DbSet.
 
 ### Get
 
-	Retrieves the first entity from the DbSet that satisfies the specified condition otherwise returns default value.
+Retrieves the first entity from the DbSet that satisfies the specified condition otherwise returns default value.
         
 ### GetAsync
 
-	Asynchronously retrieves the first entity from the DbSet that satisfies the specified condition otherwise returns default value
+Asynchronously retrieves the first entity from the DbSet that satisfies the specified condition otherwise returns default value
         
 ### Update
 
-	Updates the specified entities in the DbSet.
+Updates the specified entities in the DbSet.
 
 ### UpdateAsync
 
-	Asynchronously updates the specified entities in the DbSet.
+Asynchronously updates the specified entities in the DbSet.
 
 ## Usage
 
