@@ -30,7 +30,7 @@ namespace Han.EntityFrameworkCore.Repository
             Expression<Func<TEntity, object>> orderby = null,
             int? skip = null,
             int? take = null,
-            params Expression<Func<TEntity, object>>[] includes)
+            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
         {
             return Query(predicate, orderby, skip, take, includes).ToList();
         }
@@ -41,7 +41,7 @@ namespace Han.EntityFrameworkCore.Repository
             Expression<Func<TEntity, object>> orderby = null,
             int? skip = null,
             int? take = null,
-            params Expression<Func<TEntity, object>>[] includes)
+            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
         {
             return await Query(predicate, orderby, skip, take, includes).ToListAsync();
         }
@@ -49,7 +49,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// <inheritdoc cref="IRepository{TEntity}.AnyAsync"/>
         public async Task<bool> AnyAsync(
             Expression<Func<TEntity, bool>> predicate = null,
-            params Expression<Func<TEntity, object>>[] includes)
+            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
         {
             using (var context = GetDataContext())
             {
@@ -140,7 +140,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// <inheritdoc cref="IRepository{TEntity}.Any"/>
         public bool Any(
             Expression<Func<TEntity, bool>> predicate,
-            params Expression<Func<TEntity, object>>[] includes)
+            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
         {
             using (var context = GetDataContext())
             {
@@ -153,7 +153,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// <inheritdoc cref="IRepository{TEntity}.Get"/>
         public TEntity Get(
             Expression<Func<TEntity, bool>> predicate,
-            params Expression<Func<TEntity, object>>[] includes)
+            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
         {
             using (var context = GetDataContext())
             {
@@ -164,7 +164,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// <inheritdoc cref="IRepository{TEntity}.GetAsync"/>
         public async Task<TEntity> GetAsync(
             Expression<Func<TEntity, bool>> predicate,
-            params Expression<Func<TEntity, object>>[] includes)
+            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
         {
             using (var context = GetDataContext())
             {
@@ -173,10 +173,10 @@ namespace Han.EntityFrameworkCore.Repository
         }
 
         private IQueryable<TEntity> AggregateIncludes(TContext context,
-            params Expression<Func<TEntity, object>>[] includes)
+            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
         {
-            return includes.Aggregate((IQueryable<TEntity>) context.Set<TEntity>(),
-                (current, item) => current.Include(item)).AsQueryable();
+            return includes.Aggregate((IQueryable<TEntity>)context.Set<TEntity>(),
+                (current, include) => include(current)).AsQueryable();
         }
 
         private IQueryable<TEntity> Query(
@@ -184,7 +184,7 @@ namespace Han.EntityFrameworkCore.Repository
             Expression<Func<TEntity, object>> orderby = null,
             int? skip = null,
             int? take = null,
-            params Expression<Func<TEntity, object>>[] includes)
+            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
         {
             using (var context = GetDataContext())
             {
