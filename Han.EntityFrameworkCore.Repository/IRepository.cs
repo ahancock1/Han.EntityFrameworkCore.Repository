@@ -1,11 +1,4 @@
-﻿// -----------------------------------------------------------------------
-//   Copyright (C) 2018 Adam Hancock
-//    
-//   IRepository.cs can not be copied and/or distributed without the express
-//   permission of Adam Hancock
-// -----------------------------------------------------------------------
-
-namespace Han.EntityFrameworkCore.Repository
+﻿namespace Han.EntityFrameworkCore.Repository
 {
     using System;
     using System.Collections.Generic;
