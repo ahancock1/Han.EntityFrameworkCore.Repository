@@ -10,7 +10,6 @@ namespace Han.EntityFrameworkCore.Repository
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Linq.Expressions;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
 
@@ -38,13 +37,13 @@ namespace Han.EntityFrameworkCore.Repository
             Func<TEntity, object> orderby = null,
             int? skip = null,
             int? take = null,
-            params Expression<Func<TEntity, object>>[] includes)
+            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
             where TEntity : class
         {
             using (var context = GetDataContext())
             {
-                var items = includes.Aggregate((IQueryable<TEntity>) context.Set<TEntity>(),
-                    (current, item) => current.Include(item)).AsEnumerable();
+                var items = includes.Aggregate((IQueryable<TEntity>)context.Set<TEntity>(),
+                    (current, include) => include(current)).AsEnumerable();
 
                 if (predicate != null)
                 {
@@ -77,17 +76,17 @@ namespace Han.EntityFrameworkCore.Repository
         /// <param name="orderby"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
-        /// <param name="include"></param>
+        /// <param name="includes"></param>
         /// <returns></returns>
         protected Task<IEnumerable<TEntity>> AllAsync<TEntity>(
             Func<TEntity, bool> predicate = null,
             Func<TEntity, object> orderby = null,
             int? skip = null,
             int? take = null,
-            params Expression<Func<TEntity, object>>[] include)
+            params Func<IQueryable<TEntity>, IQueryable<TEntity>>[] includes)
             where TEntity : class
         {
-            return Task.Run(() => All(predicate, orderby, skip, take, include));
+            return Task.Run(() => All(predicate, orderby, skip, take, includes));
         }
 
         /// <summary>
@@ -128,7 +127,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// </summary>
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to delete. </param>
-        /// <returns>True if all the entites have been deleted. </returns>
+        /// <returns>True if all the entities have been deleted. </returns>
         protected bool Delete<TEntity>(params TEntity[] entities)
             where TEntity : class
         {
@@ -149,7 +148,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// </summary>
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to delete. </param>
-        /// <returns>True if all the entites have been deleted. </returns>
+        /// <returns>True if all the entities have been deleted. </returns>
         protected Task<bool> DeleteAsync<TEntity>(params TEntity[] entities)
             where TEntity : class
         {
@@ -161,7 +160,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// </summary>
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to update. </param>
-        /// <returns>True if all the entites have been updated. </returns>
+        /// <returns>True if all the entities have been updated. </returns>
         protected bool Update<TEntity>(params TEntity[] entities)
             where TEntity : class
         {
@@ -182,7 +181,7 @@ namespace Han.EntityFrameworkCore.Repository
         /// </summary>
         /// <typeparam name="TEntity">The type of entity used in <see cref="DbSet{TEntity}" />. </typeparam>
         /// <param name="entities">The entities to update. </param>
-        /// <returns>True if all the entites have been updated. </returns>
+        /// <returns>True if all the entities have been updated. </returns>
         protected Task<bool> UpdateAsync<TEntity>(params TEntity[] entities)
             where TEntity : class
         {
